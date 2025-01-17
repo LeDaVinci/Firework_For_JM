@@ -2573,6 +2573,13 @@ const soundManager = {
 		bufferSource.buffer = buffer;
 		bufferSource.connect(gainNode);
 		gainNode.connect(this.ctx.destination);
+
+		if (type === 'bg') {
+			bufferSource.onended = () => {
+				// Start over when the sound finishes playing
+				bufferSource.start(0);
+			};
+		}
 		bufferSource.start(0);
 	},
 };
