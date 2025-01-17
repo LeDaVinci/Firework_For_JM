@@ -78,7 +78,7 @@ const mainStage = new Stage("main-canvas");
 const stages = [trailsStage, mainStage];
 
 //随机文字烟花内容
-const randomWords = ["新年快乐", "心想事成"];
+const randomWords = ["祝我们敏敏和家人", "新年快乐", "心想事成", "身体健康", "希望敏敏", "一直开心快乐"];
 const wordDotsMap = {};
 randomWords.forEach((word) => {
 	wordDotsMap[word] = MyMath.literalLattice(word, 3, "Gabriola,华文琥珀", "90px");
@@ -580,11 +580,13 @@ function randomColor(options) {
 	return color;
 }
 
-// 随机获取一段文字
+// 获取需要展示的文字
+let textIndex = 0
 function randomWord() {
-	if (randomWords.length === 0) return "";
-	if (randomWords.length === 1) return randomWords[0];
-	return randomWords[(Math.random() * randomWords.length) | 0];
+	if (textIndex === randomWords.length) {
+		textIndex = 0
+	}
+	return randomWords[textIndex++];
 }
 
 function whiteOrGold() {
@@ -868,6 +870,8 @@ function init() {
 
 	// Apply initial config
 	configDidUpdate();
+
+	soundManager.playSound("bg");
 }
 
 function fitShellPositionInBoundsH(position) {
@@ -1750,6 +1754,19 @@ function createBurst(count, particleFactory, startAngle = 0, arcLength = PI_2) {
 	}
 }
 
+let timerStarted = false
+function createWordBurstTimer(wordText, particleFactory, center_x, center_y) {
+	if (timerStarted) return
+	timerStarted = true
+	// 创建一个轮询定时器，每5秒执行一次
+	const intervalId = setInterval(() => {
+		// 每5秒执行一次 createWordBurst 和 dotStarFactory 逻辑
+		createWordBurst(randomWord(), particleFactory, center_x, center_y);
+
+	}, 5000);  // 5000ms 即 5秒
+}
+
+let wordShowCount = 0
 /**
  *
  * @param {string} wordText  文字内容
@@ -1766,7 +1783,7 @@ function createWordBurst(wordText, particleFactory, center_x, center_y) {
 	var dcenterX = map.width / 2;
 	var dcenterY = map.height / 2;
 	var color = randomColor();
-	var strobed = Math.random() < 0.5;
+	var strobed = true;
 	var strobeColor = strobed ? randomColor() : color;
 
 	for (let i = 0; i < map.points.length; i++) {
@@ -2067,6 +2084,7 @@ class Shell {
 				//随机speed 0.05~0.15
 				var speed = Math.random() * 0.1 + 0.05;
 
+				let life = 2000;
 				const star = Star.add(
 					point.x,
 					point.y,
@@ -2074,7 +2092,7 @@ class Shell {
 					Math.random() * 2 * Math.PI,
 					speed,
 					// add minor variation to star life
-					this.starLife + Math.random() * this.starLife * this.starLifeVariation + speed * 1000,
+					life,
 					this.horsetail ? this.comet && this.comet.speedX : 0,
 					this.horsetail ? this.comet && this.comet.speedY : -standardInitialSpeed,
 					2
@@ -2401,13 +2419,13 @@ const soundManager = {
 	ctx: new (window.AudioContext || window.webkitAudioContext)(),
 	sources: {
 		lift: {
-			volume: 1,
+			volume: 0.5,
 			playbackRateMin: 0.85,
 			playbackRateMax: 0.95,
 			fileNames: ["lift1.mp3", "lift2.mp3", "lift3.mp3"],
 		},
 		burst: {
-			volume: 1,
+			volume: 0.5,
 			playbackRateMin: 0.8,
 			playbackRateMax: 0.9,
 			fileNames: ["burst1.mp3", "burst2.mp3"],
@@ -2429,6 +2447,12 @@ const soundManager = {
 			playbackRateMin: 1,
 			playbackRateMax: 1,
 			fileNames: ["crackle-sm-1.mp3"],
+		},
+		bg: {
+			volume: 0.5,
+			playbackRateMin: 1,
+			playbackRateMax: 1,
+			fileNames: ["xiaoyu.mp3"],
 		},
 	},
 
