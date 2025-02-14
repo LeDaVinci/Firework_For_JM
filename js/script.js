@@ -78,7 +78,7 @@ const mainStage = new Stage("main-canvas");
 const stages = [trailsStage, mainStage];
 
 //随机文字烟花内容
-const randomWords = ["敏敏", "我真的好喜欢你", "想要真的和你在一起💗", "可以做我女朋友吗"];
+const randomWords = ["敏敏", "我真的好喜欢你", "想要真的和你在一起💗", "你愿意和我成为情侣吗"];
 const wordDotsMap = {};
 randomWords.forEach((word) => {
 	wordDotsMap[word] = MyMath.literalLattice(word, 3, "Gabriola,华文琥珀", "90px");
